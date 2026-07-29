@@ -1,0 +1,90 @@
+# Vigenere Cipher
+
+def generate_key(text, key):
+    key = list(key)
+    j = 0
+
+    for i in range(len(text)):
+        if text[i].isalpha():
+            if j == len(key):
+                j = 0
+            key.append(key[j])
+            j += 1
+        else:
+            key.append(text[i])
+
+    return "".join(key[:len(text)])
+
+
+def encrypt(text, key):
+
+    key = generate_key(text, key)
+
+    cipher = ""
+
+    for i in range(len(text)):
+
+        ch = text[i]
+
+        if ch.isupper():
+
+            shift = ord(key[i].upper()) - ord('A')
+            cipher += chr((ord(ch) - ord('A') + shift) % 26 + ord('A'))
+
+        elif ch.islower():
+
+            shift = ord(key[i].upper()) - ord('A')
+            cipher += chr((ord(ch) - ord('a') + shift) % 26 + ord('a'))
+
+        else:
+            cipher += ch
+
+    return cipher
+
+
+def decrypt(cipher, key):
+
+    key = generate_key(cipher, key)
+
+    plain = ""
+
+    for i in range(len(cipher)):
+
+        ch = cipher[i]
+
+        if ch.isupper():
+
+            shift = ord(key[i].upper()) - ord('A')
+            plain += chr((ord(ch) - ord('A') - shift) % 26 + ord('A'))
+
+        elif ch.islower():
+
+            shift = ord(key[i].upper()) - ord('A')
+            plain += chr((ord(ch) - ord('a') - shift) % 26 + ord('a'))
+
+        else:
+            plain += ch
+
+    return plain
+
+
+try:
+
+    while True:
+
+        plaintext = input("\nEnter Plain Text : ")
+
+        key = input("Enter Key        : ")
+
+        if key == "":
+            print("Key cannot be empty.")
+            continue
+
+        encrypted = encrypt(plaintext, key)
+        decrypted = decrypt(encrypted, key)
+
+        print("\nEncrypted Text :", encrypted)
+        print("Decrypted Text :", decrypted)
+
+except KeyboardInterrupt:
+    print("\n\nProgram Closed.")

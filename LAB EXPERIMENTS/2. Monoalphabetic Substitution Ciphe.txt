@@ -1,0 +1,56 @@
+# Monoalphabetic Substitution Cipher
+
+import string
+
+alphabet = string.ascii_uppercase
+key = "QWERTYUIOPASDFGHJKLZXCVBNM"
+
+
+def encrypt(text):
+    cipher = ""
+
+    for ch in text:
+
+        if ch.isupper():
+            cipher += key[alphabet.index(ch)]
+
+        elif ch.islower():
+            cipher += key[alphabet.index(ch.upper())].lower()
+
+        else:
+            cipher += ch
+
+    return cipher
+
+
+def decrypt(text):
+    plain = ""
+
+    for ch in text:
+
+        if ch.isupper():
+            plain += alphabet[key.index(ch)]
+
+        elif ch.islower():
+            plain += alphabet[key.index(ch.upper())].lower()
+
+        else:
+            plain += ch
+
+    return plain
+
+
+try:
+
+    while True:
+
+        plaintext = input("\nEnter Plain Text : ")
+
+        encrypted = encrypt(plaintext)
+        decrypted = decrypt(encrypted)
+
+        print("\nEncrypted Text :", encrypted)
+        print("Decrypted Text :", decrypted)
+
+except KeyboardInterrupt:
+    print("\n\nProgram Closed.")

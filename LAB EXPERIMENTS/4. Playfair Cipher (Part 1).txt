@@ -1,0 +1,193 @@
+ Playfair Cipher (Part 1)
+
+def create_matrix(key):
+    key = key.upper().replace("J", "I")
+    matrix = []
+
+    for ch in key:
+        if ch.isalpha() and ch not in matrix:
+            matrix.append(ch)
+
+    for ch in "ABCDEFGHIKLMNOPQRSTUVWXYZ":
+        if ch not in matrix:
+            matrix.append(ch)
+
+    return [matrix[i:i+5] for i in range(0, 25, 5)]
+
+
+def find_position(matrix, ch):
+    if ch == "J":
+        ch = "I"
+
+    for i in range(5):
+        for j in range(5):
+            if matrix[i][j] == ch:
+                return i, j
+
+
+def prepare_text(text):
+
+    original_case = []
+
+    cleaned = ""
+
+    for ch in text:
+        if ch.isalpha():
+            original_case.append(ch.islower())
+            cleaned += ch.upper()
+
+    cleaned = cleaned.replace("J", "I")
+
+    result = ""
+    case_result = []
+
+    i = 0
+
+    while i < len(cleaned):
+
+        a = cleaned[i]
+        a_case = original_case[i]
+
+        if i + 1 < len(cleaned):
+
+            b = cleaned[i + 1]
+            b_case = original_case[i + 1]
+
+            if a == b:
+
+                result += a + "X"
+
+                case_result.append(a_case)
+                case_result.append(False)
+
+                i += 1
+
+            else:
+
+                result += a + b
+
+                case_result.append(a_case)
+                case_result.append(b_case)
+
+                i += 2
+
+        else:
+
+            result += a + "X"
+
+            case_result.append(a_case)
+            case_result.append(False)
+
+            i += 1
+
+    return result, case_result
+
+
+def restore_case(text, case_info):
+
+    output = ""
+
+    for i in range(len(text)):
+
+        if case_info[i]:
+            output += text[i].lower()
+        else:
+            output += text[i]
+
+    return output
+
+
+def encrypt(text, key):
+
+    matrix = create_matrix(key)
+
+    text, case_info = prepare_text(text)
+
+    cipher = ""
+
+    for i in range(0, len(text), 2):
+
+        a = text[i]
+        b = text[i + 1]
+
+        r1, c1 = find_position(matrix, a)
+        r2, c2 = find_position(matrix, b)
+
+        if r1 == r2:
+
+            cipher += matrix[r1][(c1 + 1) % 5]
+            cipher += matrix[r2][(c2 + 1) % 5]
+
+        elif c1 == c2:
+
+            cipher += matrix[(r1 + 1) % 5][c1]
+            cipher += matrix[(r2 + 1) % 5][c2]
+
+        else:
+
+            cipher += matrix[r1][c2]
+            cipher += matrix[r2][c1]
+
+    cipher = restore_case(cipher, case_info)
+
+    return cipher
+
+def decrypt(cipher, key):
+
+    matrix = create_matrix(key)
+
+    cipher, case_info = prepare_text(cipher)
+
+    plain = ""
+
+    for i in range(0, len(cipher), 2):
+
+        a = cipher[i]
+        b = cipher[i + 1]
+
+        r1, c1 = find_position(matrix, a)
+        r2, c2 = find_position(matrix, b)
+
+        if r1 == r2:
+
+            plain += matrix[r1][(c1 - 1) % 5]
+            plain += matrix[r2][(c2 - 1) % 5]
+
+        elif c1 == c2:
+
+            plain += matrix[(r1 - 1) % 5][c1]
+            plain += matrix[(r2 - 1) % 5][c2]
+
+        else:
+
+            plain += matrix[r1][c2]
+            plain += matrix[r2][c1]
+
+    plain = restore_case(plain, case_info)
+
+    return plain
+
+
+try:
+
+    while True:
+
+        plaintext = input("\nEnter Plain Text : ")
+
+        key = input("Enter Key        : ")
+
+        if key.strip() == "":
+            print("Key cannot be empty.")
+            continue
+
+        encrypted = encrypt(plaintext, key)
+
+        decrypted = decrypt(encrypted, key)
+
+        print("\nEncrypted Text :", encrypted)
+
+        print("Decrypted Text :", decrypted)
+
+except KeyboardInterrupt:
+
+    print("\n\nProgram Closed.")

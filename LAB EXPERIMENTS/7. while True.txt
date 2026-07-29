@@ -1,0 +1,54 @@
+while True:
+    try:
+        text = input("Enter Plain Text : ").replace(" ", "").upper()
+        key = input("Enter Key : ")
+
+        col = len(key)
+        row = len(text) // col
+
+        if len(text) % col != 0:
+            row += 1
+
+        while len(text) < row * col:
+            text += 'X'
+
+        matrix = []
+
+        index = 0
+        for i in range(row):
+            temp = []
+            for j in range(col):
+                temp.append(text[index])
+                index += 1
+            matrix.append(temp)
+
+        order = sorted(list(enumerate(key)), key=lambda x: x[1])
+
+        cipher = ""
+
+        for pos, ch in order:
+            for i in range(row):
+                cipher += matrix[i][pos]
+
+        print("Encrypted Text :", cipher)
+
+        decrypt_matrix = [['' for j in range(col)] for i in range(row)]
+
+        index = 0
+        for pos, ch in order:
+            for i in range(row):
+                decrypt_matrix[i][pos] = cipher[index]
+                index += 1
+
+        plain = ""
+
+        for i in range(row):
+            for j in range(col):
+                plain += decrypt_matrix[i][j]
+
+        print("Decrypted Text :", plain.rstrip('X'))
+        print()
+
+    except KeyboardInterrupt:
+        print("\nProgram Stopped.")
+        break
